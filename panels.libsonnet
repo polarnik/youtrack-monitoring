@@ -31,28 +31,56 @@ local g = import 'g.libsonnet';
                     value: null,
                   },
                   {
-                    color: '#8e3bb84d',
-                    value: -10,
-                  },
-                  {
-                    color: 'blue',
-                    value: -20,
-                  },
-                  {
-                    color: 'yellow',
-                    value: -30,
-                  },
-                  {
-                    color: 'orange',
-                    value: -40,
+                    color: 'dark-red',
+                    value: -60,
                   },
                   {
                     color: 'red',
                     value: -50,
                   },
                   {
-                    color: 'dark-red',
-                    value: -60,
+                    value: -50,
+                    color: '#EAB839',
+                  },
+                  {
+                    color: 'orange',
+                    value: -40,
+                  },
+                  {
+                    color: 'yellow',
+                    value: -30,
+                  },
+                  {
+                    color: 'blue',
+                    value: -20,
+                  },
+                  {
+                    color: '#8e3bb84d',
+                    value: -10,
+                  },
+                  {
+                    value: 0,
+                    color: '#ffffff',
+                  },
+                  {
+                    value: 10,
+                    color: 'super-light-green',
+                  },
+                  {
+                    value: 20,
+                    color: 'light-green',
+                  },
+                  {
+                    value: 30,
+                    color: 'green',
+                  },
+                  {
+                    value: 40,
+                    color: 'semi-dark-green',
+                  },
+                  {
+                    value: 50,
+                    color: 'dark-green',
                   },
                 ],
               },

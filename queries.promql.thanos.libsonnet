@@ -6,10 +6,11 @@ local timeSeries = g.panel.timeSeries;
 
 {
   units: {
-    percentunit: 'percentunit',
+    percent: 'percent',
     bool_yes_no: 'bool_yes_no',
     none: 'none',
     bytes: 'bytes',
+    count_per_second: 'cps'
   },
 
   filter: 'environment="$environment", service="$service", instance=~"$instance"',
@@ -99,14 +100,127 @@ local timeSeries = g.panel.timeSeries;
       + prometheusQuery.withRange(true),
     ],
 
+  Xodus_entity_store_metrics : {
+    local filter = 'path="/home/javaapp/teamsysdata/youtrack", environment="$environment", service="$service", instance=~"$instance" ',
+    cached_jobs: {
+        Queued__Non_Queued : {
+            // ➕ Queued + Not Queued (per 1 second)
+            Queued__and__Non_Queued_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    (
+                    sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval]))
+                    +
+                    sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval]))
+                    +
+                    sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval]))
+                    ) * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    (
+                    sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    +
+                    sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    +
+                    sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    )  * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ✅ Queued (per 1 second)
+            Queued_jobs_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    (
+                    sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval]))
+                    +
+                    sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval]))
+                    ) * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    (
+                    sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    +
+                    sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    )  * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ❌ Not Queued (per 1 second)
+            NotQueued_jobs_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    (
+                    sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval]))
+                    ) * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    (
+                    sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    )  * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ✅ % Queued
+            Queued_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec.current
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued__and__Non_Queued_per_sec.current
+                     }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec.prev
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued__and__Non_Queued_per_sec.prev
+                     }
+            },
+            // ❌ % Not Queued
+            NotQueued_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.NotQueued_jobs_per_sec.current
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued__and__Non_Queued_per_sec.current
+                     }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.NotQueued_jobs_per_sec.prev
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued__and__Non_Queued_per_sec.prev
+                     }
+            },
+        },
+
+    }
+  },
 
   process: {
     cpu: {
-      unit: $.units.percentunit,
+      unit: $.units.percent,
       current:
-        'process_cpu_load{ %(filter)s }' % $,
+        '100 * process_cpu_load{ %(filter)s }' % $,
       prev:
-        'process_cpu_load{ %(filter)s } offset ${offset}' % $,
+        '100 * process_cpu_load{ %(filter)s } offset ${offset}' % $,
     },
     cpu_cores: {
       unit: $.units.none,

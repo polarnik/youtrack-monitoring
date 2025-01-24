@@ -23,9 +23,12 @@ g.dashboard.new('YouTrack Process')
 + g.dashboard.withPanels(
   g.util.grid.wrapPanels(
     [
+      // Version
       row.new('Version'),
       panels.texts.version,
       panels.timeseries.version('Version', queries.version),
+
+      // CPU
       row.new('CPU'),
       panels.combo.stat.a_bigger_value_is_a_problem(
         'CPU %', queries.diff(queries.process.cpu)
@@ -41,6 +44,7 @@ g.dashboard.new('YouTrack Process')
         'CPU Cores', queries.start_prev_current_diff(queries.process.cpu_cores), queries.process.cpu_cores.unit
       ),
 
+      // Memory
       row.new('Memory'),
       panels.combo.stat.a_bigger_value_is_a_problem(
         'Resident Memory', queries.diff(queries.process.resident_memory)
@@ -56,6 +60,7 @@ g.dashboard.new('YouTrack Process')
         'Virtual Memory', queries.start_prev_current_diff(queries.process.virtual_memory), queries.process.virtual_memory.unit
       ),
 
+      //File Descriptors
       row.new('File Descriptors'),
       panels.combo.stat.a_bigger_value_is_a_problem(
         'FDS', queries.diff(queries.process.open_fds)
