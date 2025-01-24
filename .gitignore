@@ -1,2 +1,9 @@
 .DS_Store
 
+/jsonnetfile.lock.json
+/vendor/
+
+original.json
+youtrack_process.original.json
+*.json
+*.jar
