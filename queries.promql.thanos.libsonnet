@@ -103,6 +103,80 @@ local timeSeries = g.panel.timeSeries;
   Xodus_entity_store_metrics : {
     local filter = 'path="/home/javaapp/teamsysdata/youtrack", environment="$environment", service="$service", instance=~"$instance" ',
     cached_jobs: {
+        Queued : {
+            // ✅ Consistent (per 1 second)
+            Consistent_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ❌ Non Consistent (per 1 second)
+            Non_Consistent_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ✅ % Consistent ( 100 * Consistent / Queued )
+            Consistent_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued.Consistent_per_sec.current
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec.current
+                     }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued.Consistent_per_sec.prev
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec.prev
+                     }
+            },
+            // ❌ % Non Consistent ( 100 * Non Consistent / Queued )
+            Non_Consistent_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued.Non_Consistent_per_sec.current
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec.current
+                     }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s ) /
+                    ( ( %(total)s ) != 0 )
+                ||| % {
+                        part: $.Xodus_entity_store_metrics.cached_jobs.Queued.Non_Consistent_per_sec.prev
+                        , total: $.Xodus_entity_store_metrics.cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec.prev
+                     }
+            }
+        },
         Queued__Non_Queued : {
             // ➕ Queued + Not Queued (per 1 second)
             Queued__and__Non_Queued_per_sec: {

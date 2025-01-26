@@ -7,9 +7,9 @@ local variables = import './variables.libsonnet';
 local queries = import './queries.promql.thanos.libsonnet';
 local cached_jobs = queries.Xodus_entity_store_metrics.cached_jobs;
 
-g.dashboard.new('YouTrack Xodus entity store metrics (DB)')
+g.dashboard.new('YouTrack Xodus entity store metrics (DB): ⚙️ Cached Jobs -> ✅ Queued | ❌ Non Queued')
 + g.dashboard.withDescription(|||
-  YouTrack Xodus entity store metrics (DB)
+  YouTrack Xodus entity store metrics (DB): ⚙️ Cached Jobs -> ✅ Queued | ❌ Non Queued
 |||)
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
@@ -30,7 +30,13 @@ g.dashboard.new('YouTrack Xodus entity store metrics (DB)')
       panels.timeseries.version('Version', queries.version),
 
       // ⚙️ Cached Jobs -> Queued | Non Queued
-      row.new('⚙️ Cached Jobs -> Queued | Non Queued'),
+      row.new('ℹ️ Info: ⚙️ Cached Jobs -> ✅ Queued | ❌ Non Queued')
+      + row.withCollapsed(true)
+      + row.withPanels([
+      panels.texts.image('https://polarnik.github.io/youtrack-monitoring/Cached.png')
+      ]),
+
+      row.new('⚙️ Cached Jobs -> ✅ Queued | ❌ Non Queued'),
       panels.combo.stat.a_bigger_value_is_better(
         '⚙️ Cached Jobs',
         queries.diff(cached_jobs.Queued__Non_Queued.Queued__and__Non_Queued_per_sec)
@@ -84,6 +90,7 @@ g.dashboard.new('YouTrack Xodus entity store metrics (DB)')
         queries.start_prev_current_diff(cached_jobs.Queued__Non_Queued.NotQueued_percent),
         cached_jobs.Queued__Non_Queued.NotQueued_percent.unit
       ),
+
     ], 20, 7, 0
   )
 )

@@ -14,7 +14,7 @@ local g = import 'g.libsonnet';
        *  Чем ниже, тем краснее
        */
       a_bigger_value_is_better(title, target):
-        self.base_stat(title + ' ($offset ago vs last $diff_interval)', target)
+        self.base_stat(title + ' (last $diff_interval vs $offset ago)', target)
         + {
           timeFrom: '$diff_interval',
           maxDataPoints: 300,
@@ -173,7 +173,7 @@ local g = import 'g.libsonnet';
 
     timeSeries: {
       current_vs_prev(title, target, unit):
-        timeSeries.new(title + ' (🔴current vs 🔵prev)')
+        timeSeries.new(title + ' (🟥 current vs 🟦 prev)')
         + timeSeries.gridPos.withH(7)
         + timeSeries.gridPos.withW(20)
         + timeSeries.gridPos.withX(4)
@@ -374,19 +374,28 @@ local g = import 'g.libsonnet';
 
   texts: {
     local text = g.panel.text,
+    local canvas = g.panel.canvas,
 
-    local base = text.new('')
-                 + text.gridPos.withH(7)
-                 + text.gridPos.withW(4)
-                 + text.gridPos.withX(0)
-                 + text.options.withMode('markdown')
-                 + text.options.code.withLanguage('plaintext')
-                 + text.options.code.withShowLineNumbers(false)
-                 + text.options.code.withShowMiniMap(false),
+    image(url):
+        $.texts.base(
+        "<img src='" + url + "' style='height: 100%' />"
+        )
+        + text.gridPos.withW(24),
+
+    base(content):
+        text.new('')
+         + text.gridPos.withH(7)
+         + text.gridPos.withW(4)
+         + text.gridPos.withX(0)
+         + text.options.withMode('markdown')
+         + text.options.code.withLanguage('plaintext')
+         + text.options.code.withShowLineNumbers(false)
+         + text.options.code.withShowMiniMap(false)
+         + text.options.withContent(content)
+         ,
 
     version:
-      base
-      + text.options.withContent(
+      $.texts.base(
         |||
           ### Version
           Different colours 🟩🟨🟦 are different versions.

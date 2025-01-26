@@ -10,8 +10,8 @@ local var = g.dashboard.variable;
         + var.custom.generalOptions.withCurrent('7d', '7d'),
 
     diff_interval:
-        var.custom.new('diff_interval', ['1h', '2h', '3h', '4h', '5h', '6h', '1d', '2d'])
-        + var.custom.generalOptions.withCurrent('1h', '1h'),
+        var.custom.new('diff_interval', ['1h', '2h', '3h', '4h', '5h', '6h', '12h', '1d', '2d', '3d', '4d', '7d'])
+        + var.custom.generalOptions.withCurrent('3h', '3h'),
 
     service:
         var.custom.new('service', ['youtrack.jetbrains.com']),
