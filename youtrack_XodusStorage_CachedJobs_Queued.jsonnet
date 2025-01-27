@@ -7,10 +7,22 @@ local variables = import './variables.libsonnet';
 local queries = import './queries.promql.thanos.libsonnet';
 local cached_jobs = queries.Xodus_entity_store_metrics.cached_jobs;
 
-g.dashboard.new('YouTrack Xodus entity store metrics (DB): ⚙️ Cached Jobs -> ✅ Queued -> ✅ Consistent | ❌ Non Consistent')
+g.dashboard.new('Xodus storage: ✅ Queued → 🟡 Consistent | 🟠 Non Consistent')
 + g.dashboard.withDescription(|||
-  YouTrack Xodus entity store metrics (DB): ⚙️ Cached Jobs -> ✅ Queued -> ✅ Consistent | ❌ Non Consistent
+  YouTrack Xodus entity store metrics (DB):
+   →
+  ✅ Queued →
+  🟡 Consistent | 🟠 Non Consistent
 |||)
++ g.dashboard.withUid('xodus_storage_queued')
++ g.dashboard.withTags([
+    'YouTrack Server',
+    'Xodus',
+    'Xodus Entity',
+    '✅ Queued',
+    '🟡 Consistent',
+    '🟠 Non Consistent'
+    ])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.datasource,
@@ -29,14 +41,14 @@ g.dashboard.new('YouTrack Xodus entity store metrics (DB): ⚙️ Cached Jobs ->
       panels.texts.version,
       panels.timeseries.version('Version', queries.version),
 
-      // ⚙️ Cached Jobs -> Queued | Non Queued
-      row.new('ℹ️ Info: ⚙️ Cached Jobs -> ✅ Queued -> 🟡 Consistent | 🟠 Non Consistent')
+      // ⚙️ Cached Jobs → Queued | Non Queued
+      row.new('ℹ️ Info: ⚙️ Cached Jobs → ✅ Queued → 🟡 Consistent | 🟠 Non Consistent')
       + row.withCollapsed(true)
       + row.withPanels([
       panels.texts.image('https://polarnik.github.io/youtrack-monitoring/Cached-Enqueued.png')
       ]),
 
-      row.new('⚙️ Cached Jobs -> ✅ Queued -> 🟡 Consistent | 🟠 Non Consistent'),
+      row.new('⚙️ Cached Jobs → ✅ Queued → 🟡 Consistent | 🟠 Non Consistent'),
       // ✅ Queued
       panels.combo.stat.a_bigger_value_is_better(
         '✅ Queued',

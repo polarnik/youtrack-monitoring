@@ -103,6 +103,467 @@ local timeSeries = g.panel.timeSeries;
   Xodus_entity_store_metrics : {
     local filter = 'path="/home/javaapp/teamsysdata/youtrack", environment="$environment", service="$service", instance=~"$instance" ',
     cached_jobs: {
+        // ⚙️ Cached Jobs → ✅ Queued → (🟡|🟠) → ❇️ Execute → ✳️ Started → 🚫️ Interrupted → ⌛️ Obsolete | ⏰ Overdue
+        Interrupted : {
+            // 🚫️ Interrupted
+            Interrupted_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ⌛️ Obsolete
+            Obsolete_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsObsolete{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsObsolete{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ⏰ Overdue
+            Overdue_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsOverdue{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsOverdue{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ⌛️ % Obsolete
+            Obsolete_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Obsolete_per_sec.current,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Interrupted_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Obsolete_per_sec.prev,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Interrupted_per_sec.prev
+                }
+            },
+            // ⏰ % Overdue
+            Overdue_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Overdue_per_sec.current,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Interrupted_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Overdue_per_sec.prev,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Interrupted.Interrupted_per_sec.prev
+                }
+            },
+        },
+        // ⚙️ Cached Jobs → ✅ Queued → (🟡|🟠) → ❇️ Execute → ✳️ Started → ↩️ Retried → 🟡 Consistent | 🟠 Non Consistent
+        Retried : {
+            // ↩️ Retried
+            Retried_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    %(Consistent)s
+                    +
+                    %(NonConsistent)s
+                ||| % {
+                    Consistent   : $.Xodus_entity_store_metrics.cached_jobs.Retried.Consistent_per_sec.current,
+                    NonConsistent: $.Xodus_entity_store_metrics.cached_jobs.Retried.NonConsistent_per_sec.current
+                    }
+                ,
+                prev:
+                |||
+                    %(Consistent)s
+                    +
+                    %(NonConsistent)s
+                ||| % {
+                    Consistent   : $.Xodus_entity_store_metrics.cached_jobs.Retried.Consistent_per_sec.prev,
+                    NonConsistent: $.Xodus_entity_store_metrics.cached_jobs.Retried.NonConsistent_per_sec.prev
+                    }
+            },
+            // 🟡 Consistent
+            Consistent_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsRetried{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsRetried{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // 🟠 Non Consistent
+            NonConsistent_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingCountJobsRetried{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingCountJobsRetried{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // 🟡 % Consistent
+            Consistent_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Retried.Consistent_per_sec.current,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Retried.Retried_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Retried.Consistent_per_sec.prev,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Retried.Retried_per_sec.prev
+                }
+            },
+            // 🟠 % Non Consistent
+            NonConsistent_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Retried.NonConsistent_per_sec.current,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Retried.Retried_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Retried.NonConsistent_per_sec.prev,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Retried.Retried_per_sec.prev
+                }
+            },
+        },
+        // ⚙️ Cached Jobs → ✅ Queued → (🟡|🟠) → ❇️ Execute → ✳️ Started → ❎ Completed | ↩️ Retried | 🚫️ Interrupted
+        Started : {
+            // ✳️ Started
+            Started_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ❎ Completed
+            Completed_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    %(started)s
+                    -
+                    %(retried)s
+                    -
+                    %(interrupted)s
+                ||| % {
+                    started: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.current,
+                    retried: $.Xodus_entity_store_metrics.cached_jobs.Started.Retried_per_sec.current,
+                    interrupted: $.Xodus_entity_store_metrics.cached_jobs.Started.Interrupted_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    %(started)s
+                    -
+                    %(retried)s
+                    -
+                    %(interrupted)s
+                ||| % {
+                    started: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.prev,
+                    retried: $.Xodus_entity_store_metrics.cached_jobs.Started.Retried_per_sec.prev,
+                    interrupted: $.Xodus_entity_store_metrics.cached_jobs.Started.Interrupted_per_sec.prev
+                }
+            },
+            // ↩️ Retried
+            Retried_per_sec: {
+                unit: $.units.count_per_second,
+                current: $.Xodus_entity_store_metrics.cached_jobs.Retried.Retried_per_sec.current,
+                prev: $.Xodus_entity_store_metrics.cached_jobs.Retried.Retried_per_sec.prev
+            },
+            // 🚫️ Interrupted
+            Interrupted_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ❎ % Completed
+            Completed_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Started.Completed_per_sec.current,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Started.Completed_per_sec.prev,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.prev
+                }
+            },
+            // ↩️ % Retried
+            Retried_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Started.Retried_per_sec.current,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Started.Retried_per_sec.prev,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.prev
+                }
+            },
+            // 🚫️ % Interrupted
+            Interrupted_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Started.Interrupted_per_sec.current,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * ( %(part)s )
+                    / (
+                    ( %(total)s ) != 0
+                    )
+                ||| % {
+                    part : $.Xodus_entity_store_metrics.cached_jobs.Started.Interrupted_per_sec.prev,
+                    total: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.prev
+                }
+            }
+        },
+        // ⚙️ Cached Jobs -> Execute -> Started | Not Started
+        Execute : {
+            // Execute (per 1 second)
+            Execute_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    %(started)s
+                    +
+                    %(notStarted)s
+                ||| % {
+                    started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Started_per_sec.current,
+                    notStarted: $.Xodus_entity_store_metrics.cached_jobs.Execute.Not_Started_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    %(started)s
+                    +
+                    %(notStarted)s
+                ||| % {
+                    started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Started_per_sec.prev,
+                    notStarted: $.Xodus_entity_store_metrics.cached_jobs.Execute.Not_Started_per_sec.prev
+                }
+            },
+            // ✅ Started (per 1 second)
+            Started_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ❌ Not Started (per 1 second)
+            Not_Started_per_sec: {
+                unit: $.units.count_per_second,
+                current:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsNotStarted{ %(filter)s }[$__rate_interval]))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+                ,
+                prev:
+                |||
+                    sum(increase(youtrack_TotalCachingJobsNotStarted{ %(filter)s }[$__rate_interval] offset ${offset}))
+                    * 1000 / $__rate_interval_ms
+                ||| % { filter: filter }
+            },
+            // ✅ % Started
+            Started_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * (
+                        %(started)s
+                    )
+                    / (
+                       ( %(execute)s ) != 0
+                    )
+                ||| % {
+                    started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Started_per_sec.current,
+                    execute: $.Xodus_entity_store_metrics.cached_jobs.Execute.Execute_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * (
+                        %(started)s
+                    )
+                    / (
+                       ( %(execute)s ) != 0
+                    )
+                ||| % {
+                    started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Started_per_sec.prev,
+                    execute: $.Xodus_entity_store_metrics.cached_jobs.Execute.Execute_per_sec.prev
+                }
+            },
+            // ❌ % Not Started
+            Not_Started_percent: {
+                unit: $.units.percent,
+                current:
+                |||
+                    100 * (
+                        %(not_started)s
+                    )
+                    / (
+                       ( %(execute)s ) != 0
+                    )
+                ||| % {
+                    not_started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Not_Started_per_sec.current,
+                    execute    : $.Xodus_entity_store_metrics.cached_jobs.Execute.Execute_per_sec.current
+                }
+                ,
+                prev:
+                |||
+                    100 * (
+                        %(not_started)s
+                    )
+                    / (
+                       ( %(execute)s ) != 0
+                    )
+                ||| % {
+                    not_started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Not_Started_per_sec.prev,
+                    execute    : $.Xodus_entity_store_metrics.cached_jobs.Execute.Execute_per_sec.prev
+                }
+            },
+        },
         Queued : {
             // ✅ Consistent (per 1 second)
             Consistent_per_sec: {
