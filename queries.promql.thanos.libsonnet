@@ -10,7 +10,8 @@ local timeSeries = g.panel.timeSeries;
     bool_yes_no: 'bool_yes_no',
     none: 'none',
     bytes: 'bytes',
-    count_per_second: 'cps'
+    count_per_second: 'cps',
+    count_per_minute: 'cpm'
   },
 
   filter: 'environment="$environment", service="$service", instance=~"$instance"',
@@ -63,7 +64,7 @@ local timeSeries = g.panel.timeSeries;
           ( %(prev)s )
         )
         /
-        ( ( %(prev)s )>0 )
+        ( round( %(prev)s , 0.0001) != 0 )
       ||| % querySet
     )
     + prometheusQuery.withLegendFormat('diff')
@@ -99,7 +100,190 @@ local timeSeries = g.panel.timeSeries;
       + prometheusQuery.withInstant(false)
       + prometheusQuery.withRange(true),
     ],
+  youtrack_HubIntegration : {
+    HubEvents: {
+        local filter = 'type="Hub", environment="$environment", service="$service", instance=~"$instance" ',
+        Pending: {
+            unit: $.units.none,
+            current:
+            |||
+                avg(youtrack_HubIntegration_HubEventsPending{ %(filter)s })
+            ||| % { filter: filter }
+            ,
+            prev:
+            |||
+                avg(youtrack_HubIntegration_HubEventsPending{ %(filter)s } offset ${offset})
+            ||| % { filter: filter }
+         },
+        Received_per_minute: {
+            unit: $.units.count_per_minute,
+            current:
+            |||
+                sum(increase(youtrack_HubIntegration_HubEventsReceived{ %(filter)s }[$__rate_interval]))
+                * 60 * 1000 / $__rate_interval_ms
+            ||| % { filter: filter }
+            ,
+            prev:
+            |||
+                sum(increase(youtrack_HubIntegration_HubEventsReceived{ %(filter)s }[$__rate_interval] offset ${offset}))
+                * 60 * 1000 / $__rate_interval_ms
+            ||| % { filter: filter }
+        },
 
+    Accepted_per_minute: {
+        unit: $.units.count_per_minute,
+        current:
+        |||
+            %(Processed)s
+            +
+            %(Failed)s
+            +
+            %(Ignored)s
+        ||| % {
+            Processed: $.youtrack_HubIntegration.HubEvents.Processed_per_minute.current,
+            Failed: $.youtrack_HubIntegration.HubEvents.Failed_per_minute.current,
+            Ignored: $.youtrack_HubIntegration.HubEvents.Ignored_per_minute.current
+        }
+        ,
+        prev:
+        |||
+            %(Processed)s
+            +
+            %(Failed)s
+            +
+            %(Ignored)s
+        ||| % {
+            Processed: $.youtrack_HubIntegration.HubEvents.Processed_per_minute.prev,
+            Failed: $.youtrack_HubIntegration.HubEvents.Failed_per_minute.prev,
+            Ignored: $.youtrack_HubIntegration.HubEvents.Ignored_per_minute.prev
+        }
+    },
+
+    Ignored_per_minute: {
+        unit: $.units.count_per_minute,
+        current:
+        |||
+            sum(increase(youtrack_HubIntegration_HubEventsIgnored{ %(filter)s }[$__rate_interval]))
+            * 60 * 1000 / $__rate_interval_ms
+        ||| % { filter: filter }
+        ,
+        prev:
+        |||
+            sum(increase(youtrack_HubIntegration_HubEventsIgnored{ %(filter)s }[$__rate_interval] offset ${offset}))
+            * 60 * 1000 / $__rate_interval_ms
+        ||| % { filter: filter }
+    },
+
+    Failed_per_minute: {
+        unit: $.units.count_per_minute,
+        current:
+        |||
+            sum(increase(youtrack_HubIntegration_HubEventsFailed{ %(filter)s }[$__rate_interval]))
+            * 60 * 1000 / $__rate_interval_ms
+        ||| % { filter: filter }
+        ,
+        prev:
+        |||
+            sum(increase(youtrack_HubIntegration_HubEventsFailed{ %(filter)s }[$__rate_interval] offset ${offset}))
+            * 60 * 1000 / $__rate_interval_ms
+        ||| % { filter: filter }
+    },
+
+    Processed_per_minute: {
+        unit: $.units.count_per_minute,
+        current:
+        |||
+            sum(increase(youtrack_HubIntegration_HubEventsProcessed{ %(filter)s }[$__rate_interval]))
+            * 60 * 1000 / $__rate_interval_ms
+        ||| % { filter: filter }
+        ,
+        prev:
+        |||
+            sum(increase(youtrack_HubIntegration_HubEventsProcessed{ %(filter)s }[$__rate_interval] offset ${offset}))
+            * 60 * 1000 / $__rate_interval_ms
+        ||| % { filter: filter }
+    },
+
+    Ignored_percent: {
+        unit: $.units.percent,
+        current:
+        |||
+            100 * (
+            %(Ignored)s
+            ) / (
+            ( %(Accepted)s ) != 0
+            )
+        ||| % {
+            Ignored : $.youtrack_HubIntegration.HubEvents.Ignored_per_minute.current,
+            Accepted: $.youtrack_HubIntegration.HubEvents.Accepted_per_minute.current,
+        }
+        ,
+        prev:
+        |||
+            100 * (
+            %(Ignored)s
+            ) / (
+            ( %(Accepted)s ) != 0
+            )
+        ||| % {
+            Ignored : $.youtrack_HubIntegration.HubEvents.Ignored_per_minute.prev,
+            Accepted: $.youtrack_HubIntegration.HubEvents.Accepted_per_minute.prev,
+        }
+    },
+    Processed_percent: {
+        unit: $.units.percent,
+        current:
+        |||
+            100 * (
+            %(Processed)s
+            ) / (
+            ( %(Accepted)s ) != 0
+            )
+        ||| % {
+            Processed : $.youtrack_HubIntegration.HubEvents.Processed_per_minute.current,
+            Accepted  : $.youtrack_HubIntegration.HubEvents.Accepted_per_minute.current,
+        }
+        ,
+        prev:
+        |||
+            100 * (
+            %(Processed)s
+            ) / (
+            ( %(Accepted)s ) != 0
+            )
+        ||| % {
+            Processed : $.youtrack_HubIntegration.HubEvents.Processed_per_minute.prev,
+            Accepted  : $.youtrack_HubIntegration.HubEvents.Accepted_per_minute.prev,
+        }
+    },
+    Failed_percent: {
+        unit: $.units.percent,
+        current:
+        |||
+            100 * (
+            %(Failed)s
+            ) / (
+            ( %(Accepted)s ) != 0
+            )
+        ||| % {
+            Failed  : $.youtrack_HubIntegration.HubEvents.Failed_per_minute.current,
+            Accepted: $.youtrack_HubIntegration.HubEvents.Accepted_per_minute.current,
+        }
+        ,
+        prev:
+        |||
+            100 * (
+            %(Failed)s
+            ) / (
+            ( %(Accepted)s ) != 0
+            )
+        ||| % {
+            Failed  : $.youtrack_HubIntegration.HubEvents.Failed_per_minute.prev,
+            Accepted: $.youtrack_HubIntegration.HubEvents.Accepted_per_minute.prev,
+        }
+    },
+    },
+  },
   Xodus_entity_store_metrics : {
     local filter = 'path="/home/javaapp/teamsysdata/youtrack", environment="$environment", service="$service", instance=~"$instance" ',
     cached_jobs: {

@@ -66,3 +66,13 @@ echo "💤 youtrack_XodusStorage_CachedJobs_Queued_Execute_Started_Interrupted"
 -J vendor \
 youtrack_XodusStorage_CachedJobs_Queued_Execute_Started_Interrupted.jsonnet
 echo "✅  youtrack_XodusStorage_CachedJobs_Queued_Execute_Started_Interrupted"
+
+
+echo "💤 youtrack_HubIntegration"
+./sjsonnet.jar \
+--strict --strict-import-syntax --fatal-warnings --throw-error-for-invalid-sets \
+--indent 4 --no-duplicate-keys-in-comprehension \
+--output-file youtrack_HubIntegration.json \
+-J vendor \
+youtrack_HubIntegration.jsonnet
+echo "✅  youtrack_HubIntegration"
