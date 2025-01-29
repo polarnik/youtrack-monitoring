@@ -43,6 +43,7 @@ local var = g.dashboard.variable;
         + var.query.withDatasourceFromVariable(self.datasource)
         + var.query.withRegex('/{environment="(.*)"}.*/')
         + var.query.refresh.onTime()
+        + var.query.generalOptions.withCurrent('production', 'production')
         + var.custom.selectionOptions.withMulti(false)
     ,
 

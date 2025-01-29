@@ -17,6 +17,7 @@ g.dashboard.new('YouTrack HubIntegration')
   'YouTrack Server',
   'HubIntegration',
 ])
++ panels.links(['YouTrack Server'])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.datasource,

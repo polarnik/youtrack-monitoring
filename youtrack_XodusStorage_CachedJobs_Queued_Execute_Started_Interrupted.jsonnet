@@ -27,6 +27,7 @@ g.dashboard.new('Xodus storage: 🚫️ Interrupted → ⌛️ Obsolete | ⏰ Ov
     '⌛️ Obsolete',
     '⏰ Overdue'
     ])
++ panels.links(['YouTrack Server', 'Xodus', 'Xodus Entity'])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.datasource,

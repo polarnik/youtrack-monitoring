@@ -2,6 +2,27 @@ local variables = import './variables.libsonnet';
 local g = import 'g.libsonnet';
 
 {
+  local one_tag_link(tag) = {
+        "title": tag,
+        "tags": [
+          tag
+        ],
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": true,
+        "keepTime": true,
+        "targetBlank": true,
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
+  },
+  local tag_links(tags) = {
+    "links": [
+        one_tag_link(tag) for tag in tags
+    ]
+  },
+  links(tags): tag_links(tags),
+
   combo: {
     local timeSeries = g.panel.timeSeries,
 

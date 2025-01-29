@@ -27,6 +27,7 @@ g.dashboard.new('Xodus storage: ↩️ Retried → 🟡 Consistent | 🟠 Non Co
     '🟡 Consistent',
     '🟠 Non Consistent'
     ])
++ panels.links(['YouTrack Server', 'Xodus', 'Xodus Entity'])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.datasource,

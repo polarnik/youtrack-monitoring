@@ -27,6 +27,7 @@ g.dashboard.new('Xodus storage: ✳️ Started → ❎ Completed | ↩️ Retrie
     '↩️ Retried',
     '🚫️ Interrupted'
     ])
++ panels.links(['YouTrack Server', 'Xodus', 'Xodus Entity'])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.datasource,

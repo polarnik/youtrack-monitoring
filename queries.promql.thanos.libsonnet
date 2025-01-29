@@ -100,6 +100,19 @@ local timeSeries = g.panel.timeSeries;
       + prometheusQuery.withInstant(false)
       + prometheusQuery.withRange(true),
     ],
+  youtrack_Workflow : {
+    local filter = 'environment="$environment", service="$service", instance=~"$instance" ',
+
+    RuleGuard: {
+
+    },
+    OnScheduleFull: {
+
+    },
+    Rule: {
+
+    }
+  },
   youtrack_HubIntegration : {
     HubEvents: {
         local filter = 'type="Hub", environment="$environment", service="$service", instance=~"$instance" ',

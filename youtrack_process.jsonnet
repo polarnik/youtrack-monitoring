@@ -10,6 +10,11 @@ g.dashboard.new('YouTrack Process')
 + g.dashboard.withDescription(|||
   Dashboard for YouTrack based processes
 |||)
++ g.dashboard.withUid('yt_process')
++ g.dashboard.withTags([
+  'YouTrack Server'
+])
++ panels.links(['YouTrack Server'])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.datasource,

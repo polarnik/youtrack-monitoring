@@ -25,6 +25,7 @@ g.dashboard.new('Xodus storage: 🛠 Execute → ✳️ Started | ⛔️ Not Sta
     '✳️ Started',
     '⛔️ Not Started'
     ])
++ panels.links(['YouTrack Server', 'Xodus', 'Xodus Entity'])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withVariables([
   variables.datasource,
