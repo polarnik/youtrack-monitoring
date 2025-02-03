@@ -5,6 +5,11 @@ local variables = import './variables.libsonnet';
 local timeSeries = g.panel.timeSeries;
 
 {
+  // Global common filter.
+  // It is used in queries via the expression "string-with-filter-var % $".
+  // If you want to modify the global filter - let's do it here.
+  filter: ' instance=~"$instance"',
+
   units: {
     percent: 'percent',
     bool_yes_no: 'bool_yes_no',
@@ -14,14 +19,12 @@ local timeSeries = g.panel.timeSeries;
     count_per_minute: 'cpm'
   },
 
-  filter: 'environment="$environment", service="$service", instance=~"$instance"',
-
   start: prometheusQuery.new(
            '${%s}' % variables.datasource.name,
            |||
-             (($app_start * delta(process_uptime{ %(filter)s }[$__rate_interval])) < 0)
+             (($app_start * delta({__name__=~"process_uptime.*", %(filter)s }[$__rate_interval])) < 0)
              /
-             (($app_start * delta(process_uptime{ %(filter)s }[$__rate_interval])) < 0)
+             (($app_start * delta({__name__=~"process_uptime.*", %(filter)s }[$__rate_interval])) < 0)
            ||| % $
          )
          + prometheusQuery.withEditorMode('code')
@@ -101,8 +104,6 @@ local timeSeries = g.panel.timeSeries;
       + prometheusQuery.withRange(true),
     ],
   youtrack_Workflow : {
-    local filter = 'environment="$environment", service="$service", instance=~"$instance" ',
-
     RuleGuard: {
 
     },
@@ -115,18 +116,17 @@ local timeSeries = g.panel.timeSeries;
   },
   youtrack_HubIntegration : {
     HubEvents: {
-        local filter = 'type="Hub", environment="$environment", service="$service", instance=~"$instance" ',
         Pending: {
             unit: $.units.none,
             current:
             |||
                 avg(youtrack_HubIntegration_HubEventsPending{ %(filter)s })
-            ||| % { filter: filter }
+            ||| % $
             ,
             prev:
             |||
                 avg(youtrack_HubIntegration_HubEventsPending{ %(filter)s } offset ${offset})
-            ||| % { filter: filter }
+            ||| % $
          },
         Received_per_minute: {
             unit: $.units.count_per_minute,
@@ -134,13 +134,13 @@ local timeSeries = g.panel.timeSeries;
             |||
                 sum(increase(youtrack_HubIntegration_HubEventsReceived{ %(filter)s }[$__rate_interval]))
                 * 60 * 1000 / $__rate_interval_ms
-            ||| % { filter: filter }
+            ||| % $
             ,
             prev:
             |||
                 sum(increase(youtrack_HubIntegration_HubEventsReceived{ %(filter)s }[$__rate_interval] offset ${offset}))
                 * 60 * 1000 / $__rate_interval_ms
-            ||| % { filter: filter }
+            ||| % $
         },
 
     Accepted_per_minute: {
@@ -178,13 +178,13 @@ local timeSeries = g.panel.timeSeries;
         |||
             sum(increase(youtrack_HubIntegration_HubEventsIgnored{ %(filter)s }[$__rate_interval]))
             * 60 * 1000 / $__rate_interval_ms
-        ||| % { filter: filter }
+        ||| % $
         ,
         prev:
         |||
             sum(increase(youtrack_HubIntegration_HubEventsIgnored{ %(filter)s }[$__rate_interval] offset ${offset}))
             * 60 * 1000 / $__rate_interval_ms
-        ||| % { filter: filter }
+        ||| % $
     },
 
     Failed_per_minute: {
@@ -193,13 +193,13 @@ local timeSeries = g.panel.timeSeries;
         |||
             sum(increase(youtrack_HubIntegration_HubEventsFailed{ %(filter)s }[$__rate_interval]))
             * 60 * 1000 / $__rate_interval_ms
-        ||| % { filter: filter }
+        ||| % $
         ,
         prev:
         |||
             sum(increase(youtrack_HubIntegration_HubEventsFailed{ %(filter)s }[$__rate_interval] offset ${offset}))
             * 60 * 1000 / $__rate_interval_ms
-        ||| % { filter: filter }
+        ||| % $
     },
 
     Processed_per_minute: {
@@ -208,13 +208,13 @@ local timeSeries = g.panel.timeSeries;
         |||
             sum(increase(youtrack_HubIntegration_HubEventsProcessed{ %(filter)s }[$__rate_interval]))
             * 60 * 1000 / $__rate_interval_ms
-        ||| % { filter: filter }
+        ||| % $
         ,
         prev:
         |||
             sum(increase(youtrack_HubIntegration_HubEventsProcessed{ %(filter)s }[$__rate_interval] offset ${offset}))
             * 60 * 1000 / $__rate_interval_ms
-        ||| % { filter: filter }
+        ||| % $
     },
 
     Ignored_percent: {
@@ -298,7 +298,6 @@ local timeSeries = g.panel.timeSeries;
     },
   },
   Xodus_entity_store_metrics : {
-    local filter = 'path="/home/javaapp/teamsysdata/youtrack", environment="$environment", service="$service", instance=~"$instance" ',
     cached_jobs: {
         // ⚙️ Cached Jobs → ✅ Queued → (🟡|🟠) → ❇️ Execute → ✳️ Started → 🚫️ Interrupted → ⌛️ Obsolete | ⏰ Overdue
         Interrupted : {
@@ -309,13 +308,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ⌛️ Obsolete
             Obsolete_per_sec: {
@@ -324,13 +323,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsObsolete{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsObsolete{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ⏰ Overdue
             Overdue_per_sec: {
@@ -339,13 +338,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsOverdue{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsOverdue{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ⌛️ % Obsolete
             Obsolete_percent: {
@@ -430,13 +429,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsRetried{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsRetried{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // 🟠 Non Consistent
             NonConsistent_per_sec: {
@@ -445,13 +444,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingCountJobsRetried{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingCountJobsRetried{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // 🟡 % Consistent
             Consistent_percent: {
@@ -513,13 +512,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ❎ Completed
             Completed_per_sec: {
@@ -563,13 +562,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsInterrupted{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ❎ % Completed
             Completed_percent: {
@@ -679,13 +678,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsStarted{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ❌ Not Started (per 1 second)
             Not_Started_per_sec: {
@@ -694,13 +693,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsNotStarted{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsNotStarted{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ✅ % Started
             Started_percent: {
@@ -769,13 +768,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ❌ Non Consistent (per 1 second)
             Non_Consistent_per_sec: {
@@ -784,13 +783,13 @@ local timeSeries = g.panel.timeSeries;
                 |||
                     sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval]))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
                     * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ✅ % Consistent ( 100 * Consistent / Queued )
             Consistent_percent: {
@@ -848,7 +847,7 @@ local timeSeries = g.panel.timeSeries;
                     +
                     sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval]))
                     ) * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
@@ -859,7 +858,7 @@ local timeSeries = g.panel.timeSeries;
                     +
                     sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval] offset ${offset}))
                     )  * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ✅ Queued (per 1 second)
             Queued_jobs_per_sec: {
@@ -871,7 +870,7 @@ local timeSeries = g.panel.timeSeries;
                     +
                     sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval]))
                     ) * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
@@ -880,7 +879,7 @@ local timeSeries = g.panel.timeSeries;
                     +
                     sum(increase(youtrack_TotalCachingCountJobsEnqueued{ %(filter)s }[$__rate_interval] offset ${offset}))
                     )  * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ❌ Not Queued (per 1 second)
             NotQueued_jobs_per_sec: {
@@ -890,14 +889,14 @@ local timeSeries = g.panel.timeSeries;
                     (
                     sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval]))
                     ) * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
                 ,
                 prev:
                 |||
                     (
                     sum(increase(youtrack_TotalCachingJobsNotQueued{ %(filter)s }[$__rate_interval] offset ${offset}))
                     )  * 1000 / $__rate_interval_ms
-                ||| % { filter: filter }
+                ||| % $
             },
             // ✅ % Queued
             Queued_percent: {
