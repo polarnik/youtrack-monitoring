@@ -13,9 +13,6 @@ local var = g.dashboard.variable;
         var.custom.new('diff_interval', ['1h', '2h', '3h', '4h', '5h', '6h', '12h', '1d', '2d', '3d', '4d', '7d'])
         + var.custom.generalOptions.withCurrent('3h', '3h'),
 
-    service:
-        var.custom.new('service', ['youtrack.jetbrains.com']),
-
     queryResult(query):
     {
         "definition": 'query_result(' + query + ')',
@@ -31,28 +28,13 @@ local var = g.dashboard.variable;
         "type": "query"
     },
 
-    environment:
-        var.query.new('environment',std.strReplace(
-        |||
-            query_result(sort_desc(
-                sum by (environment) (
-                    process_uptime{service="$service"}
-                ) > 0
-            ))
-        |||, '\n', ''))
-        + var.query.withDatasourceFromVariable(self.datasource)
-        + var.query.withRegex('/{environment="(.*)"}.*/')
-        + var.query.refresh.onTime()
-        + var.query.generalOptions.withCurrent('production', 'production')
-        + var.custom.selectionOptions.withMulti(false)
-    ,
 
     instance:
         var.query.new('instance',std.strReplace(
         |||
             query_result(sort_desc(
                 sum by (instance) (
-                process_uptime{environment="$environment", service="$service"}
+                youtrack_UtilizationPercent{}
                 ) > 0))
         |||, '\n', ''))
         + var.query.withDatasourceFromVariable(self.datasource)
