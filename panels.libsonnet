@@ -2,6 +2,30 @@ local variables = import './variables.libsonnet';
 local g = import 'g.libsonnet';
 
 {
+  local util_one_link_dashboard(title, UID) = {
+    "title": title,
+    "url": "/d/%(UID)s?${__all_variables}&${__url_time_range}" % {UID: UID},
+    "targetBlank": true
+  },
+  one_link(title, UID): util_one_link_dashboard(title, UID),
+  local util_link_panel(links) = {
+      "links": [
+          util_one_link_dashboard(link.title, link.UID) for link in links
+        ]
+  },
+  link_panel(links): util_link_panel(links),
+
+    local util_link_data_row(links) = {
+        "fieldConfig": {
+            "defaults": {
+            "links": [
+                util_one_link_dashboard(link.title, link.UID) for link in links
+            ]
+            }
+        }
+    },
+    link_data_row(links): util_link_data_row(links),
+
   local one_tag_link(tag) = {
         "title": tag,
         "tags": [
