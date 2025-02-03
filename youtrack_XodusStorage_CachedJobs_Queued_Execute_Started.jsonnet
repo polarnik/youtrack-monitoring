@@ -45,13 +45,13 @@ g.dashboard.new('Xodus storage: ✳️ Started → ❎ Completed | ↩️ Retrie
       panels.timeseries.version('Version', queries.version),
 
       // ⚙️ Cached Jobs → Queued | Non Queued
-      row.new('ℹ️ Info: ⚙️ Cached Jobs → ✅ Queued → (🟡|🟠) → 🛠️ Execute → ✳️ Started → ❎ Completed | ↩️ Retried | 🚫️ Interrupted')
-      + row.withCollapsed(true)
-      + row.withPanels([
-      panels.texts.image('https://polarnik.github.io/youtrack-monitoring/Execute-Started.png')
-      ]),
+      row.new('ℹ️ Info: ✳️ Started → ❎ Completed | ↩️ Retried | 🚫️ Interrupted'),
+//      + row.withCollapsed(true)
+//      + row.withPanels([
+      panels.texts.image('https://polarnik.github.io/youtrack-monitoring/Execute-Started.png'),
+//      ]),
 
-      row.new('⚙️ Cached Jobs → ✅ Queued → (🟡|🟠) → 🛠️ Execute → ✳️ Started → ❎ Completed | ↩️ Retried | 🚫️ Interrupted'),
+      row.new('✳️ Started → ❎ Completed | ↩️ Retried | 🚫️ Interrupted'),
       // ✳️ Started
       panels.combo.stat.a_bigger_value_is_better(
         '✳️ Started',
