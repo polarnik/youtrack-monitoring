@@ -23,8 +23,6 @@ g.dashboard.new('YouTrack HubIntegration')
   variables.datasource,
   variables.offset,
   variables.diff_interval,
-  variables.service,
-  variables.environment,
   variables.instance,
   variables.app_start,
 ])
@@ -36,7 +34,6 @@ g.dashboard.new('YouTrack HubIntegration')
       panels.texts.version,
       panels.timeseries.version('Version', queries.version),
 
-      // ⚙️ Cached Jobs → Queued | Non Queued
       row.new('ℹ️ Info')
       + row.withCollapsed(true),
 
