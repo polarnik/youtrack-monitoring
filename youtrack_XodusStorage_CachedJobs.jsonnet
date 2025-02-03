@@ -60,12 +60,19 @@ g.dashboard.new('Xodus storage: ⚙️ Cached Jobs → ✅ Queued | ❌ Non Queu
       panels.combo.stat.a_bigger_value_is_better(
         '✅ Queued',
         queries.diff(cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec)
-      ),
+      )
+      + panels.link_panel(
+        [{title:'✅ Queued', UID: 'xodus_storage_queued'}])
+      + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('✅ Queued', 'xodus_storage_queued'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '✅ Queued (per 1 second)',
         queries.start_prev_current_diff(cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec),
         cached_jobs.Queued__Non_Queued.Queued_jobs_per_sec.unit
-      ),
+      )
+      + panels.link_panel(
+        [{title:'✅ Queued', UID: 'xodus_storage_queued'}])
+      ,
 
       // ❌ Not Queued (per 1 second)
       panels.combo.stat.a_bigger_value_is_a_problem(
@@ -82,12 +89,19 @@ g.dashboard.new('Xodus storage: ⚙️ Cached Jobs → ✅ Queued | ❌ Non Queu
       panels.combo.stat.a_bigger_value_is_better(
         '✅ % Queued',
         queries.diff(cached_jobs.Queued__Non_Queued.Queued_percent)
-      ),
+      )
+      + panels.link_panel(
+        [{title:'✅ Queued', UID: 'xodus_storage_queued'}])
+      + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('✅ Queued', 'xodus_storage_queued'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '✅ % Queued',
         queries.start_prev_current_diff(cached_jobs.Queued__Non_Queued.Queued_percent),
         cached_jobs.Queued__Non_Queued.Queued_percent.unit
-      ),
+      )
+      + panels.link_panel(
+        [{title:'✅ Queued', UID: 'xodus_storage_queued'}])
+      ,
 
       // ❌ % Not Queued
       panels.combo.stat.a_bigger_value_is_a_problem(

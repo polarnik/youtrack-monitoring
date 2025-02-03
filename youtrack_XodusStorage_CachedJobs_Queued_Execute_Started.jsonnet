@@ -78,23 +78,37 @@ g.dashboard.new('Xodus storage: ✳️ Started → ❎ Completed | ↩️ Retrie
       panels.combo.stat.a_bigger_value_is_a_problem(
         '↩️ Retried',
         queries.diff(cached_jobs.Started.Retried_per_sec)
-      ),
+      )
+              + panels.link_panel(
+                [{title:'↩️ Retried', UID: 'xodus_storage_retried'}])
+              + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('↩️ Retried', 'xodus_storage_retried'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '↩️ Retried (per 1 second)',
         queries.start_prev_current_diff(cached_jobs.Started.Retried_per_sec),
         cached_jobs.Started.Retried_per_sec.unit
-      ),
+      )
+                    + panels.link_panel(
+                      [{title:'↩️ Retried', UID: 'xodus_storage_retried'}])
+      ,
 
       // 🚫️ Interrupted
       panels.combo.stat.a_bigger_value_is_a_problem(
         '🚫️ Interrupted',
         queries.diff(cached_jobs.Started.Interrupted_per_sec)
-      ),
+      )
+      + panels.link_panel(
+        [{title:'🚫️ Interrupted', UID: 'xodus_storage_interrupted'}])
+      + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('🚫️ Interrupted', 'xodus_storage_interrupted'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '🚫️ Interrupted (per 1 second)',
         queries.start_prev_current_diff(cached_jobs.Started.Interrupted_per_sec),
         cached_jobs.Started.Interrupted_per_sec.unit
-      ),
+      )
+        + panels.link_panel(
+          [{title:'🚫️ Interrupted', UID: 'xodus_storage_interrupted'}])
+      ,
 
       // ✳️ % Completed
       panels.combo.stat.a_bigger_value_is_better(
@@ -111,23 +125,37 @@ g.dashboard.new('Xodus storage: ✳️ Started → ❎ Completed | ↩️ Retrie
       panels.combo.stat.a_bigger_value_is_a_problem(
         '↩️ % Retried',
         queries.diff(cached_jobs.Started.Retried_percent)
-      ),
+      )
+                    + panels.link_panel(
+                      [{title:'↩️ Retried', UID: 'xodus_storage_retried'}])
+                    + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('↩️ Retried', 'xodus_storage_retried'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '↩️ % Retried (100 * ↩️ Retried / ✳️ Started)',
         queries.start_prev_current_diff(cached_jobs.Started.Retried_percent),
         cached_jobs.Started.Retried_percent.unit
-      ),
+      )
+                    + panels.link_panel(
+                      [{title:'↩️ Retried', UID: 'xodus_storage_retried'}])
+      ,
 
       // 🚫️ % Interrupted
       panels.combo.stat.a_bigger_value_is_a_problem(
         '🚫️ % Interrupted',
         queries.diff(cached_jobs.Started.Interrupted_percent)
-      ),
+      )
+        + panels.link_panel(
+          [{title:'🚫️ Interrupted', UID: 'xodus_storage_interrupted'}])
+        + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('🚫️ Interrupted', 'xodus_storage_interrupted'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '🚫️ % Interrupted (100 * 🚫️ Interrupted / ✳️ Started)',
         queries.start_prev_current_diff(cached_jobs.Started.Interrupted_percent),
         cached_jobs.Started.Interrupted_percent.unit
-      ),
+      )
+          + panels.link_panel(
+            [{title:'🚫️ Interrupted', UID: 'xodus_storage_interrupted'}])
+      ,
 
     ], 20, 7, 0
   )

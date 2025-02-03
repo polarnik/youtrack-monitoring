@@ -65,12 +65,19 @@ g.dashboard.new('Xodus storage: 🛠 Execute → ✳️ Started | ⛔️ Not Sta
       panels.combo.stat.a_bigger_value_is_better(
         '✳️ Started',
         queries.diff(cached_jobs.Execute.Started_per_sec)
-      ),
+      )
+        + panels.link_panel(
+          [{title:'✳️ Started', UID: 'xodus_storage_started'}])
+        + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('✳️ Started', 'xodus_storage_started'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '✳️ Started (per 1 second)',
         queries.start_prev_current_diff(cached_jobs.Execute.Started_per_sec),
         cached_jobs.Execute.Started_per_sec.unit
-      ),
+      )
+      + panels.link_panel(
+        [{title:'✳️ Started', UID: 'xodus_storage_started'}])
+        ,
 
       // ⛔️ Not Started
       panels.combo.stat.a_bigger_value_is_a_problem(
@@ -87,12 +94,19 @@ g.dashboard.new('Xodus storage: 🛠 Execute → ✳️ Started | ⛔️ Not Sta
       panels.combo.stat.a_bigger_value_is_better(
         '✳️ % Started',
         queries.diff(cached_jobs.Execute.Started_percent)
-      ),
+      )
+              + panels.link_panel(
+                [{title:'✳️ Started', UID: 'xodus_storage_started'}])
+              + g.panel.stat.standardOptions.withLinksMixin(panels.one_link('✳️ Started', 'xodus_storage_started'))
+      ,
       panels.combo.timeSeries.current_vs_prev(
         '✳️ % Started (100 * ✳️ Started / 🛠 Execute)',
         queries.start_prev_current_diff(cached_jobs.Execute.Started_percent),
         cached_jobs.Execute.Started_percent.unit
-      ),
+      )
+            + panels.link_panel(
+              [{title:'✳️ Started', UID: 'xodus_storage_started'}])
+      ,
 
       // ⛔️ % Not Started
       panels.combo.stat.a_bigger_value_is_a_problem(
