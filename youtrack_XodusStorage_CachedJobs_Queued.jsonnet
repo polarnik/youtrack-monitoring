@@ -29,8 +29,6 @@ g.dashboard.new('Xodus storage: ✅ Queued → 🟡 Consistent | 🟠 Non Consis
   variables.datasource,
   variables.offset,
   variables.diff_interval,
-  variables.service,
-  variables.environment,
   variables.instance,
   variables.app_start,
 ])

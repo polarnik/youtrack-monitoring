@@ -31,8 +31,6 @@ g.dashboard.new('Xodus storage: 🛠 Execute → ✳️ Started | ⛔️ Not Sta
   variables.datasource,
   variables.offset,
   variables.diff_interval,
-  variables.service,
-  variables.environment,
   variables.instance,
   variables.app_start,
 ])

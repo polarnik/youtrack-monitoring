@@ -33,8 +33,6 @@ g.dashboard.new('Xodus storage: ✳️ Started → ❎ Completed | ↩️ Retrie
   variables.datasource,
   variables.offset,
   variables.diff_interval,
-  variables.service,
-  variables.environment,
   variables.instance,
   variables.app_start,
 ])
