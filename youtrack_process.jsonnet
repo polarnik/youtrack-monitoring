@@ -20,8 +20,6 @@ g.dashboard.new('YouTrack Process')
   variables.datasource,
   variables.offset,
   variables.diff_interval,
-  variables.service,
-  variables.environment,
   variables.instance,
   variables.app_start,
 ])
