@@ -63,6 +63,7 @@ local g = import 'g.libsonnet';
         + {
           timeFrom: '$diff_interval',
           maxDataPoints: 300,
+          interval: "1m",
           hideTimeOverride: true,
 
           fieldConfig: {
@@ -151,6 +152,7 @@ local g = import 'g.libsonnet';
         + {
           timeFrom: '$diff_interval',
           maxDataPoints: 300,
+          interval: "1m",
           hideTimeOverride: true,
 
           fieldConfig: {
@@ -226,7 +228,8 @@ local g = import 'g.libsonnet';
         + timeSeries.datasource.withUid('${' + variables.datasource.name + '}')
         + timeSeries.queryOptions.withTargets(target)
         + {
-          maxDataPoints: 300,
+          maxDataPoints: 200,
+          interval: "1m",
           options: {
             tooltip: {
               mode: 'multi',
@@ -442,7 +445,7 @@ local g = import 'g.libsonnet';
     version:
       $.texts.base(
         |||
-          ### Version
+          ### Version of <a href="https://www.jetbrains.com/youtrack/" target="_blank" rel="author" title="YouTrack. Project management for all your teams"><img src="https://youtrack.jetbrains.com/youtrack-wide-dark.svg" height="30" /></a>
           Different colours 🟩🟨🟦 are different versions.
 
           Move a cursor 👆to the head of the line to get version info.

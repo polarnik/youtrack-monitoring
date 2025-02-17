@@ -1,5 +1,14 @@
 #!/usr/bin/env sh
 
+echo "💤 youtrack_Workflows"
+./sjsonnet.jar \
+--strict --strict-import-syntax --fatal-warnings --throw-error-for-invalid-sets \
+--indent 4 --no-duplicate-keys-in-comprehension \
+--output-file youtrack_Workflows.json \
+-J vendor \
+youtrack_Workflows.jsonnet
+echo "✅  youtrack_Workflows"
+
 echo "💤 youtrack_process"
 ./sjsonnet.jar \
 --strict --strict-import-syntax --fatal-warnings --throw-error-for-invalid-sets \
@@ -76,3 +85,13 @@ echo "💤 youtrack_HubIntegration"
 -J vendor \
 youtrack_HubIntegration.jsonnet
 echo "✅  youtrack_HubIntegration"
+
+echo "💤 youtrack_Workflow_details"
+./sjsonnet.jar \
+--strict --strict-import-syntax --fatal-warnings --throw-error-for-invalid-sets \
+--indent 4 --no-duplicate-keys-in-comprehension \
+--output-file youtrack_Workflow_details.json \
+-J vendor \
+youtrack_Workflow_details.jsonnet
+echo "✅  youtrack_Workflow_details"
+
