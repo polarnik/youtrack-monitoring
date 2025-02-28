@@ -63,7 +63,7 @@ local g = import 'g.libsonnet';
         + {
           timeFrom: '$diff_interval',
           maxDataPoints: 300,
-          interval: "1m",
+          interval: "3m",
           hideTimeOverride: true,
 
           fieldConfig: {
@@ -152,7 +152,7 @@ local g = import 'g.libsonnet';
         + {
           timeFrom: '$diff_interval',
           maxDataPoints: 300,
-          interval: "1m",
+          interval: "3m",
           hideTimeOverride: true,
 
           fieldConfig: {
@@ -228,8 +228,8 @@ local g = import 'g.libsonnet';
         + timeSeries.datasource.withUid('${' + variables.datasource.name + '}')
         + timeSeries.queryOptions.withTargets(target)
         + {
-          maxDataPoints: 200,
-          interval: "1m",
+          maxDataPoints: 300,
+          interval: "3m",
           options: {
             tooltip: {
               mode: 'multi',
@@ -420,6 +420,119 @@ local g = import 'g.libsonnet';
     },
   },
 
+  diagram: {
+    base():
+    {
+      "datasource": {
+        "type": "grafana",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "valueName": "last"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 17,
+      "options": {
+        "useBackground": false,
+        "content": "%%{ init: { 'flowchart': { 'curve': 'monotoneX' } } }%%\nflowchart LR\n    A(⚙️ Cached Jobs) ==> B(✅ Queued)\n    A(⚙️ Cached Jobs) -.-> C(❌ Non Queued)\n    B ==> D(🟡 Consistent)\n    B ==> E(🟠 Non Consistent)\n    D ==> F(🛠 Execute)\n    E ==> F\n    F ==> G(✳️ Started)\n    F -.-> H(⛔️ Not Started)\n    G -.-> I(↩️ Retried)\n    G ==> J(❎ Completed)\n    G -.-> K(🚫️ Interrupted)\n    I -.-> L(🟡 Consistent)\n    I -.-> M(🟠 Non Consistent)\n    K -.-> N(⌛️ Obsolete)\n    K -.-> O(⏰ Overdue)",
+        "nodeSize": {
+          "minWidth": 30,
+          "minHeight": 30
+        },
+        "legend": {
+          "show": false,
+          "asTable": true,
+          "displayMode": "table",
+          "gradient": {
+            "enabled": true,
+            "show": true
+          },
+          "hideEmpty": false,
+          "hideZero": false,
+          "placement": "bottom",
+          "sortBy": "last",
+          "sortDesc": true,
+          "stats": [
+            "mean",
+            "last",
+            "min",
+            "max",
+            "sum"
+          ]
+        },
+        "mermaidThemeVariablesDark": {
+          "common": {
+            "fontFamily": "Roboto,Helvetica Neue,Arial,sans-serif"
+          },
+          "classDiagram": {},
+          "flowChart": {},
+          "sequenceDiagram": {},
+          "stateDiagram": {},
+          "userJourneyDiagram": {}
+        },
+        "mermaidThemeVariablesLight": {
+          "common": {
+            "fontFamily": "Roboto,Helvetica Neue,Arial,sans-serif"
+          },
+          "classDiagram": {},
+          "flowChart": {},
+          "sequenceDiagram": {},
+          "stateDiagram": {},
+          "userJourneyDiagram": {}
+        },
+        "style": "",
+        "authPassword": "",
+        "authUsername": "",
+        "composites": [],
+        "maxWidth": true,
+        "mermaidServiceUrl": "",
+        "metricCharacterReplacements": [],
+        "moddedSeriesVal": 0,
+        "mode": "content",
+        "pluginVersion": "",
+        "useBasicAuth": false,
+        "valueName": "last"
+      },
+      "pluginVersion": "1.10.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "queryType": "randomWalk",
+          "refId": "A"
+        }
+      ],
+      "transparent": true,
+      "type": "jdbranham-diagram-panel"
+    }
+  },
+
   texts: {
     local text = g.panel.text,
     local canvas = g.panel.canvas,
@@ -468,7 +581,8 @@ local g = import 'g.libsonnet';
 
     version(title, targets):
       $.timeseries.base(title, targets)
-      + timeSeries.queryOptions.withMaxDataPoints(100)
+      + timeSeries.queryOptions.withMaxDataPoints(300)
+      + timeSeries.queryOptions.withInterval('3m')
       + timeSeries.options.withTooltipMixin({
         hoverProximity: 30,
         mode: 'single',

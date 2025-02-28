@@ -62,13 +62,13 @@ local timeSeries = g.panel.timeSeries;
     prometheusQuery.new(
       '${%s}' % variables.datasource.name,
       |||
-        100 * (
-          ( %(current)s )
+        100 * round((
+          ( 0.0001 + %(current)s )
           -
-          ( %(prev)s )
-        )
+          ( 0.0001 + %(prev)s )
+        ), 0.0001)
         /
-        ( round( %(prev)s , 0.0001) != 0 )
+        ( round( 0.0001 + %(prev)s , 0.0001) != 0 )
       ||| % querySet
     )
     + prometheusQuery.withLegendFormat('diff')
@@ -148,9 +148,9 @@ local timeSeries = g.panel.timeSeries;
           |||
             %(Processed)s
             +
-            %(Failed)s
+            ( %(Failed)s )
             +
-            %(Ignored)s
+            ( %(Ignored)s )
           ||| % {
             Processed: $.youtrack_HubIntegration.HubEvents.Processed_per_minute.current,
             Failed: $.youtrack_HubIntegration.HubEvents.Failed_per_minute.current,
@@ -161,9 +161,9 @@ local timeSeries = g.panel.timeSeries;
           |||
             %(Processed)s
             +
-            %(Failed)s
+            ( %(Failed)s )
             +
-            %(Ignored)s
+            ( %(Ignored)s )
           ||| % {
             Processed: $.youtrack_HubIntegration.HubEvents.Processed_per_minute.prev,
             Failed: $.youtrack_HubIntegration.HubEvents.Failed_per_minute.prev,
@@ -508,9 +508,9 @@ local timeSeries = g.panel.timeSeries;
             |||
               %(started)s
               -
-              %(retried)s
+              ( %(retried)s )
               -
-              %(interrupted)s
+              ( %(interrupted)s )
             ||| % {
               started: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.current,
               retried: $.Xodus_entity_store_metrics.cached_jobs.Started.Retried_per_sec.current,
@@ -521,9 +521,9 @@ local timeSeries = g.panel.timeSeries;
             |||
               %(started)s
               -
-              %(retried)s
+              ( %(retried)s )
               -
-              %(interrupted)s
+              ( %(interrupted)s )
             ||| % {
               started: $.Xodus_entity_store_metrics.cached_jobs.Started.Started_per_sec.prev,
               retried: $.Xodus_entity_store_metrics.cached_jobs.Started.Retried_per_sec.prev,
@@ -634,7 +634,7 @@ local timeSeries = g.panel.timeSeries;
             |||
               %(started)s
               +
-              %(notStarted)s
+              ( %(notStarted)s )
             ||| % {
               started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Started_per_sec.current,
               notStarted: $.Xodus_entity_store_metrics.cached_jobs.Execute.Not_Started_per_sec.current,
@@ -644,7 +644,7 @@ local timeSeries = g.panel.timeSeries;
             |||
               %(started)s
               +
-              %(notStarted)s
+              ( %(notStarted)s )
             ||| % {
               started: $.Xodus_entity_store_metrics.cached_jobs.Execute.Started_per_sec.prev,
               notStarted: $.Xodus_entity_store_metrics.cached_jobs.Execute.Not_Started_per_sec.prev,

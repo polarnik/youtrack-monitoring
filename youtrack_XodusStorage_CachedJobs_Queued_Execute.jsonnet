@@ -46,9 +46,36 @@ g.dashboard.new('Xodus storage: 🛠 Execute → ✳️ Started | ⛔️ Not Sta
       row.new('ℹ️ Info: 🛠 Execute → ✳️ Started | ⛔️ Not Started'),
 //      + row.withCollapsed(true)
 //      + row.withPanels([
-      panels.texts.image('https://polarnik.github.io/youtrack-monitoring/Execute.png'),
+      panels.texts.image('https://polarnik.github.io/youtrack-monitoring/Execute.png')
+        + {
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 9
+          }
+        },
+      panels.diagram.base(),
 //      ]),
-
+    /*
+    %%{ init: { 'flowchart': { 'curve': 'monotoneX' } } }%%
+    flowchart LR
+        A(⚙️ Cached Jobs) ==> B(✅ Queued)
+        A(⚙️ Cached Jobs) -.-> C(❌ Non Queued)
+        B ==> D(🟡 Consistent)
+        B ==> E(🟠 Non Consistent)
+        D ==> F(🛠 Execute)
+        E ==> F
+        F ==> G(✳️ Started)
+        F -.-> H(⛔️ Not Started)
+        G -.-> I(↩️ Retried)
+        G ==> J(❎ Completed)
+        G -.-> K(🚫️ Interrupted)
+        I -.-> L(🟡 Consistent)
+        I -.-> M(🟠 Non Consistent)
+        K -.-> N(⌛️ Obsolete)
+        K -.-> O(⏰ Overdue)
+    */
       row.new('🛠 Execute → ✳️ Started | ⛔️ Not Started'),
       // 🛠 Execute
       panels.combo.stat.a_bigger_value_is_better(
